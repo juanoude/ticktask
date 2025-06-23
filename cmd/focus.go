@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"sort"
 	"ticktask/persistence"
 	"ticktask/views"
 	"time"
@@ -25,6 +26,9 @@ var focusCmd = &cobra.Command{
 			log.Fatal("error fetching tasks")
 		}
 
+		sort.Slice(tasks, func(i, j int) bool {
+			return tasks[i].Priority < tasks[j].Priority
+		})
 		selectedTask := views.RunSelector(tasks, "What task should be cancelled?")
 		fmt.Println(selectedTask.Name)
 		views.RunCountdown(25 * time.Minute)

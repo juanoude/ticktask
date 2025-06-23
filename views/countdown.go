@@ -3,15 +3,18 @@ package views
 import (
 	"fmt"
 	"os"
+	"ticktask/player"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/common-nighthawk/go-figure"
+	"github.com/ebitengine/oto/v3"
 )
 
 type countdownState struct {
 	totalTime   time.Duration
 	currentTime time.Duration
+	focusPlayer *oto.Player
 }
 
 func RunCountdown(time time.Duration) {
@@ -28,6 +31,7 @@ func initCountdown(t time.Duration) countdownState {
 	return countdownState{
 		totalTime:   t,
 		currentTime: current,
+		focusPlayer: player.InitFocusPlayer(),
 	}
 }
 
@@ -40,6 +44,7 @@ func tickEvery() tea.Cmd {
 }
 
 func (state countdownState) Init() tea.Cmd {
+	go player.PlayLoop(state.focusPlayer)
 	return tickEvery()
 }
 

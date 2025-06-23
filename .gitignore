@@ -1,2 +1,5 @@
 ticktask.db
 .DS_Store
+music/focus/*
+music/generic/*
+music/idle/*

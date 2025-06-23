@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"sort"
 	"ticktask/models"
 	"ticktask/persistence"
 
@@ -31,6 +32,10 @@ var listCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal("error fetching tasks")
 		}
+
+		sort.Slice(tasks, func(i, j int) bool {
+			return !tasks[i].IsComplete && tasks[i].Priority < tasks[j].Priority
+		})
 		fmt.Println()
 		for _, v := range tasks {
 			fmt.Printf("%s\n", renderTaskString(v))
