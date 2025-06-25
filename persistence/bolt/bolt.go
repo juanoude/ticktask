@@ -4,11 +4,10 @@ import (
 	"encoding/binary"
 	"fmt"
 	"log"
-	"os"
-	"os/user"
 	"strconv"
 	"strings"
 	"ticktask/models"
+	"ticktask/utils"
 	"time"
 
 	"github.com/boltdb/bolt"
@@ -21,11 +20,7 @@ func GetBoltClient() *BoltClient {
 }
 
 func (client *BoltClient) Open() *bolt.DB {
-	// create dir if doesn't exist
-	currentUser, err := user.Current()
-	path := currentUser.HomeDir
-	path = path + "/.ticktask/data"
-	err = os.MkdirAll(path, os.ModePerm)
+	path := utils.GetInstallationPath("/data")
 	db, err := bolt.Open(path+"/ticktask.db", 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		log.Fatal("error obtaining db lock")

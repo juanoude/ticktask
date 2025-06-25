@@ -11,10 +11,22 @@ import (
 	"github.com/ebitengine/oto/v3"
 )
 
+type UserStatus int
+
+const (
+	IdleStatus UserStatus = iota
+	FocusStatus
+)
+
 type countdownState struct {
-	totalTime   time.Duration
-	currentTime time.Duration
-	focusPlayer *oto.Player
+	totalTime       time.Duration
+	restTime        time.Duration
+	currentTime     time.Duration
+	focusPlayer     *oto.Player
+	focusController chan player.PlayerCommand
+	restPlayer      *oto.Player
+	restController  chan player.PlayerCommand
+	status          UserStatus
 }
 
 func RunCountdown(time time.Duration) {
@@ -29,9 +41,14 @@ func RunCountdown(time time.Duration) {
 func initCountdown(t time.Duration) countdownState {
 	current := 0 * time.Second
 	return countdownState{
-		totalTime:   t,
-		currentTime: current,
-		focusPlayer: player.InitFocusPlayer(),
+		totalTime:       t,
+		restTime:        0 * time.Second,
+		currentTime:     current,
+		focusPlayer:     player.InitFocusPlayer(),
+		focusController: make(chan player.PlayerCommand),
+		restPlayer:      player.InitRestPlayer(),
+		restController:  make(chan player.PlayerCommand),
+		status:          FocusStatus,
 	}
 }
 
@@ -44,24 +61,48 @@ func tickEvery() tea.Cmd {
 }
 
 func (state countdownState) Init() tea.Cmd {
-	go player.PlayLoop(state.focusPlayer)
+	go player.InitPlayerListener(state.focusPlayer, state.focusController)
+	go player.InitPlayerListener(state.restPlayer, state.restController)
+	state.focusController <- player.PlayCommand
 	return tickEvery()
 }
 
 func (state countdownState) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if state.currentTime >= state.totalTime {
+		state.restController <- player.CloseCommand
+		state.focusController <- player.CloseCommand
 		return state, tea.Quit
 	}
 
 	switch msg := msg.(type) {
 	case TickMsg:
-		state.currentTime = state.currentTime + time.Second
+		if state.status == FocusStatus {
+			state.currentTime = state.currentTime + time.Second
+		} else {
+			state.restTime = state.restTime + time.Second
+		}
 		// Return your Every command again to loop.
 		return state, tickEvery()
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
+			state.restController <- player.CloseCommand
+			state.focusController <- player.CloseCommand
+			close(state.restController)
+			close(state.focusController)
 			return state, tea.Quit
+		case " ":
+			if state.status == FocusStatus {
+				state.status = IdleStatus
+				state.focusController <- player.PauseCommand
+				state.restController <- player.PlayCommand
+			} else {
+				state.status = FocusStatus
+				state.focusController <- player.PlayCommand
+				state.restController <- player.PauseCommand
+			}
+
+			return state, nil
 		}
 	}
 
@@ -69,6 +110,8 @@ func (state countdownState) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (state countdownState) View() string {
-	myFigure := figure.NewColorFigure(state.currentTime.String(), "", "red", true)
-	return myFigure.ColorString()
+	focusFigure := figure.NewColorFigure(state.currentTime.String(), "", "green", true)
+	restFigure := figure.NewColorFigure(state.restTime.String(), "", "red", true)
+	totalView := focusFigure.ColorString() + "\n\n" + restFigure.ColorString()
+	return totalView
 }

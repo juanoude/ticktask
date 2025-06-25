@@ -11,8 +11,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var isOpen bool
+
 func init() {
 	rootCmd.AddCommand(focusCmd)
+	rootCmd.PersistentFlags().BoolVarP(&isOpen, "open", "o", false, "exceed default 25m pomodoro's time")
 }
 
 var focusCmd = &cobra.Command{
@@ -31,7 +34,10 @@ var focusCmd = &cobra.Command{
 		})
 		selectedTask := views.RunSelector(tasks, "What task should be cancelled?")
 		fmt.Println(selectedTask.Name)
-		views.RunCountdown(25 * time.Minute)
-		// persistence.GetDB().Cancel(selectedTask.Id)
+		timer := 25 * time.Minute
+		if isOpen {
+			timer = 9999 * time.Minute
+		}
+		views.RunCountdown(timer)
 	},
 }
