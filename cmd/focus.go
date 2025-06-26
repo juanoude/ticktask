@@ -6,7 +6,6 @@ import (
 	"sort"
 	"ticktask/persistence"
 	"ticktask/views"
-	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -33,11 +32,7 @@ var focusCmd = &cobra.Command{
 			return tasks[i].Priority < tasks[j].Priority
 		})
 		selectedTask := views.RunSelector(tasks, "What task should be cancelled?")
-		fmt.Println(selectedTask.Name)
-		timer := 25 * time.Minute
-		if isOpen {
-			timer = 9999 * time.Minute
-		}
-		views.RunCountdown(timer)
+		log.Println(fmt.Sprintf("You are focusing on: %s", selectedTask.Name))
+		views.RunCountdown(isOpen)
 	},
 }

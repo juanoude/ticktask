@@ -24,6 +24,19 @@ const (
 	CloseCommand PlayerCommand = "close"
 )
 
+type PlayerStatus string
+
+const (
+	PausedStatus  PlayerStatus = "paused"
+	PlayingStatus PlayerStatus = "playing"
+)
+
+type TTPlayer struct {
+	player      *oto.Player
+	controlChan chan PlayerCommand
+	status      PlayerStatus
+}
+
 func initializePlayer(fileBytes []byte) *oto.Player {
 	fileBytesReader := bytes.NewReader(fileBytes)
 	decodedMp3, err := mp3.NewDecoder(fileBytesReader)
@@ -40,6 +53,7 @@ func initializePlayer(fileBytes []byte) *oto.Player {
 		if err != nil {
 			panic("oto.NewContext failed: " + err.Error())
 		}
+
 		<-readyChan
 	}
 
@@ -47,7 +61,7 @@ func initializePlayer(fileBytes []byte) *oto.Player {
 	return player
 }
 
-func InitFocusPlayer() *oto.Player {
+func GetFocusPlayer() *TTPlayer {
 	path := utils.GetInstallationPath("/music/focus")
 	songs, err := utils.ListFilesOnDir(path)
 	if err != nil {
@@ -58,10 +72,15 @@ func InitFocusPlayer() *oto.Player {
 	if err != nil {
 		log.Fatal("error picking focus music")
 	}
-	return initializePlayer(fileBytes)
+
+	return &TTPlayer{
+		player:      initializePlayer(fileBytes),
+		controlChan: make(chan PlayerCommand),
+		status:      PausedStatus,
+	}
 }
 
-func InitRestPlayer() *oto.Player {
+func GetRestPlayer() *TTPlayer {
 	path := utils.GetInstallationPath("/music/idle")
 	songs, err := utils.ListFilesOnDir(path)
 	if err != nil {
@@ -72,36 +91,76 @@ func InitRestPlayer() *oto.Player {
 	if err != nil {
 		log.Fatal("error picking idle music")
 	}
-	return initializePlayer(fileBytes)
+
+	return &TTPlayer{
+		player:      initializePlayer(fileBytes),
+		controlChan: make(chan PlayerCommand),
+		status:      PausedStatus,
+	}
 }
 
-func InitPlayerListener(player *oto.Player, controlChan chan PlayerCommand) {
-	status := "playing"
+func GetGenericPlayer() *TTPlayer {
+	path := utils.GetInstallationPath("/music/generic")
+	songs, err := utils.ListFilesOnDir(path)
+	if err != nil {
+		log.Fatal("error picking generic songs")
+	}
+	chosenFile := utils.GetRandom(songs)
+	fileBytes, err := os.ReadFile(path + "/" + chosenFile)
+	if err != nil {
+		log.Fatal("error picking generic music")
+	}
 
-	for command := range controlChan {
+	return &TTPlayer{
+		player:      initializePlayer(fileBytes),
+		controlChan: make(chan PlayerCommand),
+		status:      PausedStatus,
+	}
+}
+
+func (ttp *TTPlayer) Play() {
+	ttp.controlChan <- PlayCommand
+}
+
+func (ttp *TTPlayer) Pause() {
+	ttp.controlChan <- PauseCommand
+}
+
+func (ttp *TTPlayer) Close() {
+	ttp.controlChan <- CloseCommand
+	close(ttp.controlChan)
+}
+
+func (ttp *TTPlayer) InitPlayer() {
+	go ttp.initListener()
+}
+
+func (ttp *TTPlayer) initListener() {
+	for command := range ttp.controlChan {
 		switch command {
 		case PauseCommand:
-			status = "paused"
-			player.Pause()
+			ttp.status = PausedStatus
+			ttp.player.Pause()
 		case PlayCommand:
-			player.Play()
-			status = "playing"
+			ttp.player.Play()
+			ttp.status = PlayingStatus
 			go func() {
-				for player.IsPlaying() {
+				time.Sleep(time.Second)
+				for ttp.player.IsPlaying() {
 					time.Sleep(time.Second)
 				}
 
-				if status == "playing" {
-					_, err := player.Seek(0, io.SeekStart)
+				if ttp.status == "playing" {
+					_, err := ttp.player.Seek(0, io.SeekStart)
 					if err != nil {
 						panic("player.Seek failed: " + err.Error())
 					}
-					controlChan <- PlayCommand
+					ttp.controlChan <- PlayCommand
 				}
 			}()
 
 		case CloseCommand:
-			player.Close()
+			ttp.player.Close()
 		}
 	}
 }
