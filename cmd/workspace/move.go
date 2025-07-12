@@ -1,7 +1,6 @@
 package workspace
 
 import (
-	"fmt"
 	"log"
 	"ticktask/persistence"
 	"ticktask/views"
@@ -18,7 +17,6 @@ var moveCmd = &cobra.Command{
 	Short: "migrates your todos",
 	Long:  "Here your can change tasks from one workspace to another",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Here is the workspaces that you have: ")
 		list := persistence.GetDB().GetWorkspaces()
 		selectedIndex := views.RunSelector(list, "What is the workspace you want to move tasks from?")
 		origin := list[selectedIndex]

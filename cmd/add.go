@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 	"ticktask/cmd/workspace"
@@ -39,6 +40,11 @@ var addCmd = &cobra.Command{
 		}
 
 		workspace := workspace.GetSelectedWorkspace()
-		persistence.GetDB().Add(int(priority), name, workspace)
+		err := persistence.GetDB().Add(int(priority), name, workspace)
+		if err != nil {
+			log.Fatal("error when creating task")
+		}
+
+		fmt.Println("Task created successfully")
 	},
 }

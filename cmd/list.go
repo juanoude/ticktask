@@ -30,7 +30,6 @@ var listCmd = &cobra.Command{
 	Long:  `List tasks, can also display done tasks optionally`,
 	Run: func(cmd *cobra.Command, args []string) {
 		workspace := workspace.GetSelectedWorkspace()
-		log.Println(workspace)
 		tasks, err := persistence.GetDB().Get(onlyIncomplete, workspace)
 		if err != nil {
 			log.Fatal("error fetching tasks")

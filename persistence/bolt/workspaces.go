@@ -2,7 +2,6 @@ package bolt
 
 import (
 	"errors"
-	"log"
 	"strings"
 
 	"github.com/boltdb/bolt"
@@ -67,7 +66,6 @@ func (client *BoltClient) AddWorkspace(name string) error {
 
 func (client *BoltClient) RemoveWorkspace(name string) error {
 	currentList := client.GetWorkspaces()
-	log.Println(currentList)
 	db := client.Open()
 	defer db.Close()
 	return db.Update(func(tx *bolt.Tx) error {

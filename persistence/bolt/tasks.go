@@ -37,14 +37,11 @@ func (client *BoltClient) Get(onlyIncomplete bool, workspace string) ([]models.T
 	var results []models.Task
 	err := db.View(func(tx *bolt.Tx) error {
 		bucket, err := checkoutBucket(tx, workspace)
-		log.Println(bucket)
-		log.Println(err)
 		if err != nil {
 			return nil
 		}
 
 		cursor := bucket.Cursor()
-		log.Println(cursor, "Cursor")
 		for key, value := cursor.First(); key != nil; key, value = cursor.Next() {
 			decodedValues := strings.Split(string(value), defaultSeparator)
 			priority, err := strconv.ParseInt(strings.TrimSpace(decodedValues[0]), 10, 64)

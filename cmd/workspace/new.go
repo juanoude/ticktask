@@ -17,7 +17,6 @@ var newCmd = &cobra.Command{
 	Short: "creates a workspace",
 	Long:  "Here you can have a new one",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Creating new workspace")
 		if v, ok := utils.SafeArgsIndex(args, 0); !ok || len(v) == 0 {
 			fmt.Println("You must provide a workspace name")
 			return
