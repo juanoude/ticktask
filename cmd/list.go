@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"sort"
+	"ticktask/cmd/workspace"
 	"ticktask/models"
 	"ticktask/persistence"
 
@@ -28,7 +29,9 @@ var listCmd = &cobra.Command{
 	Short: "List all tasks",
 	Long:  `List tasks, can also display done tasks optionally`,
 	Run: func(cmd *cobra.Command, args []string) {
-		tasks, err := persistence.GetDB().Get(onlyIncomplete)
+		workspace := workspace.GetSelectedWorkspace()
+		log.Println(workspace)
+		tasks, err := persistence.GetDB().Get(onlyIncomplete, workspace)
 		if err != nil {
 			log.Fatal("error fetching tasks")
 		}

@@ -3,6 +3,7 @@ package cmd
 import (
 	"log"
 	"strconv"
+	"ticktask/cmd/workspace"
 	"ticktask/persistence"
 
 	"github.com/spf13/cobra"
@@ -37,6 +38,7 @@ var addCmd = &cobra.Command{
 			log.Fatal("name is not provided")
 		}
 
-		persistence.GetDB().Add(int(priority), name)
+		workspace := workspace.GetSelectedWorkspace()
+		persistence.GetDB().Add(int(priority), name, workspace)
 	},
 }

@@ -34,7 +34,7 @@ type countdown struct {
 }
 
 func RunCountdown(isOpenFlag bool) {
-	p := tea.NewProgram(initCountdown(false))
+	p := tea.NewProgram(initCountdown(isOpenFlag))
 	_, err := p.Run()
 	if err != nil {
 		fmt.Printf("Oops, there's been an error: %v", err)

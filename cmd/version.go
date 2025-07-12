@@ -15,6 +15,6 @@ var versionCmd = &cobra.Command{
 	Short: "Print the current version",
 	Long:  `All software has versions. This is ticktack's`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Tick Task Focus Nest v0.0.0")
+		fmt.Println("Tick Task Focus Nest v0.3.0")
 	},
 }

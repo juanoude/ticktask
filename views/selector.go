@@ -3,7 +3,6 @@ package views
 import (
 	"fmt"
 	"os"
-	"ticktask/models"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -15,8 +14,8 @@ type selectorState struct {
 	Selected int      // which is selected
 }
 
-func RunSelector(tasks []models.Task, question string) models.Task {
-	p := tea.NewProgram(initSelector(tasks, question))
+func RunSelector(options []string, question string) int {
+	p := tea.NewProgram(initSelector(options, question))
 	result, err := p.Run()
 	if err != nil {
 		fmt.Printf("Oops, there's been an error: %v", err)
@@ -24,17 +23,13 @@ func RunSelector(tasks []models.Task, question string) models.Task {
 	}
 
 	finalResult := result.(selectorState)
-	return tasks[finalResult.Selected]
+	return finalResult.Selected
 }
 
-func initSelector(tasks []models.Task, questionString string) selectorState {
-	var stringifiedTasks []string
-	for _, v := range tasks {
-		stringifiedTasks = append(stringifiedTasks, fmt.Sprintf("%d -> %s", v.Priority, v.Name))
-	}
+func initSelector(options []string, questionString string) selectorState {
 	return selectorState{
 		question: questionString,
-		tasks:    stringifiedTasks,
+		tasks:    options,
 		cursor:   0,
 		Selected: 0,
 	}

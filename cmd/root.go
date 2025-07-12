@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"ticktask/cmd/workspace"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -24,6 +25,10 @@ func init() {
 	// viper.BindPFlag("useViper", rootCmd.PersistentFlags().Lookup("viper"))
 	// viper.SetDefault("author", "NAME HERE <EMAIL ADDRESS>")
 	// viper.SetDefault("license", "apache")
+	//
+	// ---------
+	// Adding commands in separate packages/folders
+	rootCmd.AddCommand(workspace.WorkspaceCmd)
 }
 
 func initConfig() {
