@@ -7,7 +7,7 @@ import (
 )
 
 var WorkspaceCmd = &cobra.Command{
-	Use:   "workspace",
+	Use:   "workspaces",
 	Short: "Manage workspaces for your tasks",
 	Long:  "Here you can group your todos and time tracking into separate workspaces",
 	Run: func(cmd *cobra.Command, args []string) {

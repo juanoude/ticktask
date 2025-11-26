@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"log"
+	"sort"
 	"ticktask/cmd/workspace"
 	"ticktask/persistence"
 	"ticktask/utils"
@@ -28,6 +29,14 @@ var cancelCmd = &cobra.Command{
 
 		stringifiedTasks := utils.StringifyTasks(tasks)
 		selectedIndex := views.RunSelector(stringifiedTasks, "What task should be cancelled?")
+		if selectedIndex < 0 {
+			return
+		}
+
+		sort.Slice(tasks, func(i, j int) bool {
+			return tasks[i].Priority < tasks[j].Priority
+		})
+
 		persistence.GetDB().Cancel(tasks[selectedIndex].Id, workspace)
 	},
 }

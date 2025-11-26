@@ -28,7 +28,8 @@ var listCmd = &cobra.Command{
 		fmt.Println("Here are the workspaces that you have: ")
 		for _, v := range list {
 			if v == selected {
-				fmt.Println(fmt.Sprintf("-> %s", v))
+				fmt.Printf("-> %s", v)
+				fmt.Println()
 				continue
 			}
 

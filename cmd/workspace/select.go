@@ -18,6 +18,9 @@ var selectCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		workspaces := persistence.GetDB().GetWorkspaces()
 		selectedIndex := views.RunSelector(workspaces, "Select the workspace you want to work on:")
+		if selectedIndex < 0 {
+			return
+		}
 		persistence.GetDB().SaveSelectedWorkspace(workspaces[selectedIndex])
 	},
 }

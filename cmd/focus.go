@@ -37,6 +37,10 @@ var focusCmd = &cobra.Command{
 
 		stringifiedTasks := utils.StringifyTasks(tasks)
 		selectedIndex := views.RunSelector(stringifiedTasks, "What task should be cancelled?")
+		if selectedIndex < 0 {
+			return
+		}
+
 		log.Println(fmt.Sprintf("You are focusing on: %s", tasks[selectedIndex].Name))
 		views.RunCountdown(isOpen)
 	},

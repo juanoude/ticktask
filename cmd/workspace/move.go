@@ -19,10 +19,18 @@ var moveCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		list := persistence.GetDB().GetWorkspaces()
 		selectedIndex := views.RunSelector(list, "What is the workspace you want to move tasks from?")
+		if selectedIndex < 0 {
+			return
+		}
+
 		origin := list[selectedIndex]
 
 		list = append(list[:selectedIndex], list[selectedIndex+1:]...)
 		targetIndex := views.RunSelector(list, "What is the workspace you want to migrate your tasks to?")
+		if targetIndex < 0 {
+			return
+		}
+
 		target := list[targetIndex]
 
 		tasks, err := persistence.GetDB().Get(true, origin)

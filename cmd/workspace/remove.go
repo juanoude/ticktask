@@ -21,6 +21,11 @@ var removeCmd = &cobra.Command{
 		workspaces := persistence.GetDB().GetWorkspaces()
 		selectedWorkspace := persistence.GetDB().GetSelectedWorkspace()
 		selectedIndex := views.RunSelector(workspaces, "Which one you want to remove?")
+
+		if selectedIndex < 0 {
+			return
+		}
+
 		if len(workspaces) <= 1 {
 			log.Fatal("you can only delete when you have more than one workspace")
 		}

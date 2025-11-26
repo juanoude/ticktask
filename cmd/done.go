@@ -39,6 +39,10 @@ var doneCmd = &cobra.Command{
 
 		stringifiedTasks := utils.StringifyTasks(tasks)
 		selectedIndex := views.RunSelector(stringifiedTasks, "What task was masterfully done?")
+		if selectedIndex < 0 {
+			return
+		}
+
 		persistence.GetDB().Complete(tasks[selectedIndex], workspace)
 	},
 }
