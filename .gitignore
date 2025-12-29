@@ -3,3 +3,5 @@ ticktask.db
 music/focus/*
 music/generic/*
 music/idle/*
+
+*.env

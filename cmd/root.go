@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"ticktask/cmd/sync"
 	"ticktask/cmd/workspace"
 
 	"github.com/spf13/cobra"
@@ -29,6 +30,7 @@ func init() {
 	// ---------
 	// Adding commands in separate packages/folders
 	rootCmd.AddCommand(workspace.WorkspaceCmd)
+	rootCmd.AddCommand(sync.SyncCmd)
 }
 
 func initConfig() {
