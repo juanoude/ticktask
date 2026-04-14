@@ -15,11 +15,14 @@ import (
 	"github.com/aws/smithy-go"
 )
 
+// AmazonService provides S3 operations for file upload and download.
+// It wraps an S3 client and context for making AWS API calls.
 type AmazonService struct {
 	S3Client *s3.Client
 	ctx      context.Context
 }
 
+// GetService creates a new AmazonService from an AWS configuration.
 func GetService(config aws.Config, ctx context.Context) *AmazonService {
 	return &AmazonService{
 		S3Client: s3.NewFromConfig(config),
@@ -27,6 +30,8 @@ func GetService(config aws.Config, ctx context.Context) *AmazonService {
 	}
 }
 
+// ListBuckets prints up to 10 S3 buckets for the configured AWS account.
+// Used for debugging and verifying AWS credentials.
 func (amz *AmazonService) ListBuckets() {
 	count := 10
 	fmt.Printf("Let's list up to %v buckets for your account.\n", count)
@@ -52,6 +57,12 @@ func (amz *AmazonService) ListBuckets() {
 	}
 }
 
+// UploadObject uploads a local file to an S3 bucket.
+// It waits for the object to exist after upload to confirm success.
+// Parameters:
+//   - bucketName: The S3 bucket name
+//   - objectKey: The key (path) for the object in S3
+//   - fileName: Local file path to upload
 func (amz *AmazonService) UploadObject(bucketName string, objectKey string, fileName string) error {
 	file, err := os.Open(fileName)
 	if err != nil {
@@ -84,6 +95,12 @@ func (amz *AmazonService) UploadObject(bucketName string, objectKey string, file
 	return err
 }
 
+// DownloadObject downloads an object from S3 and saves it to a local file.
+// Creates or overwrites the local file with the downloaded content.
+// Parameters:
+//   - bucketName: The S3 bucket name
+//   - objectKey: The key (path) of the object in S3
+//   - fileName: Local file path to save the downloaded content
 func (amz *AmazonService) DownloadObject(bucketName string, objectKey string, fileName string) error {
 
 	result, err := amz.S3Client.GetObject(amz.ctx, &s3.GetObjectInput{

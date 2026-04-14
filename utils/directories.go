@@ -1,3 +1,5 @@
+// Package utils provides utility functions used throughout the TickTask application.
+// This includes directory management, random selection, and argument handling helpers.
 package utils
 
 import (
@@ -7,8 +9,14 @@ import (
 	"os/user"
 )
 
-// GetInstallationPath picks a relative dir path and return an equivalent homeDir directory path
-// If the folder doesn't exist it will create a new one.
+// GetInstallationPath constructs an absolute path within the TickTask data directory (~/.ticktask).
+// It takes a relative directory path (e.g., "/data", "/music/focus") and returns the full path.
+// The directory is created if it doesn't exist.
+//
+// Example:
+//
+//	GetInstallationPath("/data") → "/home/user/.ticktask/data"
+//	GetInstallationPath("")      → "/home/user/.ticktask"
 func GetInstallationPath(relativeDir string) string {
 	currentUser, err := user.Current()
 	if err != nil {
@@ -25,6 +33,9 @@ func GetInstallationPath(relativeDir string) string {
 	return path
 }
 
+// ListFilesOnDir returns a list of filenames (not directories) in the specified path.
+// Returns an error if the directory cannot be read or contains no files.
+// Used primarily for listing available music files in the local music directories.
 func ListFilesOnDir(path string) ([]string, error) {
 	fileNamesList := []string{}
 	entries, err := os.ReadDir(path)

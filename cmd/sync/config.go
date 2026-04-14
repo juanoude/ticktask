@@ -12,6 +12,10 @@ func init() {
 	SyncCmd.AddCommand(configCmd)
 }
 
+// configCmd sets up AWS credentials and S3 bucket information.
+// Prompts for: region, bucket name, access key ID, and secret access key.
+// Non-sensitive values (region, bucket) are stored in the local database.
+// Sensitive values (credentials) are stored in the system keyring.
 var configCmd = &cobra.Command{
 	Use:   "config",
 	Short: "configure your s3 credentials and info",

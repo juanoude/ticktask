@@ -14,10 +14,14 @@ func init() {
 	rootCmd.AddCommand(addCmd)
 }
 
+// addCmd creates a new task in the current workspace.
+// Usage: ticktask add <priority> <name>
+// Priority is an integer (lower = more important).
 var addCmd = &cobra.Command{
-	Use:   "add",
-	Short: "Print the current version",
-	Long:  `All software has versions. This is ticktack's`,
+	Use:   "add [priority] [name]",
+	Short: "Add a new task to the current workspace",
+	Long:  `Creates a new task with the specified priority and name in the currently selected workspace.`,
+	Args:  cobra.MinimumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) < 2 {
 			log.Fatal("Priority and task name should be provided\n ticktask add [PRIORITY] [NAME]")

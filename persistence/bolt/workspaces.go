@@ -7,12 +7,19 @@ import (
 	"github.com/boltdb/bolt"
 )
 
+// Workspace storage constants.
+// Workspaces are stored in a special "workspaces" bucket with two keys:
+//   - "list": All workspace names joined by "::"
+//   - "current": The currently selected workspace name
 const workspacesBucket = "workspaces"
 const workspacesOptionsKey = "list"
 const workspacesSelectedKey = "current"
 
+// NoSelectedWorkspaces is returned when no workspace is currently selected.
 var NoSelectedWorkspaces = errors.New("there is no selected workspaces")
 
+// GetWorkspaces returns all workspace names as a string slice.
+// Returns an empty slice if no workspaces exist.
 func (client *BoltClient) GetWorkspaces() []string {
 	db := client.Open()
 	defer db.Close()
@@ -34,6 +41,9 @@ func (client *BoltClient) GetWorkspaces() []string {
 	return results
 }
 
+// AddWorkspace appends a new workspace name to the list.
+// Workspaces are stored as a "::" separated string.
+// Does not check for duplicates.
 func (client *BoltClient) AddWorkspace(name string) error {
 	currentList := client.GetWorkspaces()
 
@@ -64,6 +74,9 @@ func (client *BoltClient) AddWorkspace(name string) error {
 	})
 }
 
+// RemoveWorkspace removes a workspace by name from the list.
+// Note: This only removes from the workspace list, not the task buckets.
+// Task data in the workspace bucket remains in the database.
 func (client *BoltClient) RemoveWorkspace(name string) error {
 	currentList := client.GetWorkspaces()
 	db := client.Open()
@@ -95,6 +108,8 @@ func (client *BoltClient) RemoveWorkspace(name string) error {
 	})
 }
 
+// SaveSelectedWorkspace sets the currently active workspace.
+// This workspace is used by default for all task operations.
 func (client *BoltClient) SaveSelectedWorkspace(name string) error {
 	db := client.Open()
 	defer db.Close()
@@ -107,6 +122,8 @@ func (client *BoltClient) SaveSelectedWorkspace(name string) error {
 	})
 }
 
+// GetSelectedWorkspace returns the currently active workspace name.
+// Returns an empty string if no workspace is selected.
 func (client *BoltClient) GetSelectedWorkspace() string {
 	db := client.Open()
 	defer db.Close()

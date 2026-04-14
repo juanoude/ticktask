@@ -13,10 +13,14 @@ func init() {
 	WorkspaceCmd.AddCommand(removeCmd)
 }
 
+// removeCmd deletes a workspace from the list.
+// Requires at least 2 workspaces (cannot delete the last one).
+// If the deleted workspace was selected, automatically selects another.
+// Note: Task data in the workspace bucket is not deleted from the database.
 var removeCmd = &cobra.Command{
 	Use:   "remove",
-	Short: "removes a workspace",
-	Long:  "Were you supposed to live with them forever?",
+	Short: "Delete a workspace",
+	Long:  `Opens an interactive selector to choose a workspace to delete. Cannot delete the last workspace.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		workspaces := persistence.GetDB().GetWorkspaces()
 		selectedWorkspace := persistence.GetDB().GetSelectedWorkspace()
@@ -31,6 +35,7 @@ var removeCmd = &cobra.Command{
 		}
 
 		persistence.GetDB().RemoveWorkspace(workspaces[selectedIndex])
+		// If we deleted the currently selected workspace, switch to another
 		if selectedWorkspace == workspaces[selectedIndex] {
 			workspaces = slices.Delete(workspaces, selectedIndex, selectedIndex+1)
 			persistence.GetDB().SaveSelectedWorkspace(workspaces[0])

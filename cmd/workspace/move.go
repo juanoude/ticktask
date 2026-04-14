@@ -12,10 +12,13 @@ func init() {
 	WorkspaceCmd.AddCommand(moveCmd)
 }
 
+// moveCmd copies incomplete tasks from one workspace to another.
+// Shows two interactive selectors: source workspace, then destination.
+// Note: Tasks are copied, not moved - originals remain in the source workspace.
 var moveCmd = &cobra.Command{
 	Use:   "move",
-	Short: "migrates your todos",
-	Long:  "Here your can change tasks from one workspace to another",
+	Short: "Copy tasks between workspaces",
+	Long:  `Copies all incomplete tasks from a source workspace to a destination workspace.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		list := persistence.GetDB().GetWorkspaces()
 		selectedIndex := views.RunSelector(list, "What is the workspace you want to move tasks from?")
@@ -25,6 +28,7 @@ var moveCmd = &cobra.Command{
 
 		origin := list[selectedIndex]
 
+		// Remove source from destination options
 		list = append(list[:selectedIndex], list[selectedIndex+1:]...)
 		targetIndex := views.RunSelector(list, "What is the workspace you want to migrate your tasks to?")
 		if targetIndex < 0 {
@@ -39,6 +43,7 @@ var moveCmd = &cobra.Command{
 			log.Fatal("Error gathering tasks")
 		}
 
+		// Copy each task to the destination workspace
 		for _, task := range tasks {
 			persistence.GetDB().Add(task.Priority, task.Name, target)
 		}

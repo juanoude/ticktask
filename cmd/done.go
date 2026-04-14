@@ -11,20 +11,24 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// appState is unused but kept for potential future use.
 type appState struct {
-	tasks    []string // items on the to-do list
-	cursor   int      // which to-do list item our cursor is pointing at
-	Selected int      // which is selected
+	tasks    []string
+	cursor   int
+	Selected int
 }
 
 func init() {
 	rootCmd.AddCommand(doneCmd)
 }
 
+// doneCmd marks a task as completed.
+// Shows an interactive selector to choose which task to complete.
+// The task is moved from the active bucket to the "done" bucket.
 var doneCmd = &cobra.Command{
 	Use:   "done",
-	Short: "Completes a task",
-	Long:  `Don't you want some awesome completeness madness in your goals?`,
+	Short: "Mark a task as completed",
+	Long:  `Opens an interactive selector to choose a task to mark as done.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		workspace := workspace.GetSelectedWorkspace()
 		tasks, err := persistence.GetDB().Get(true, workspace)

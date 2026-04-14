@@ -10,6 +10,9 @@ func init() {
 	SyncCmd.AddCommand(downCmd)
 }
 
+// downCmd pulls the database backup from S3 and overwrites the local database.
+// Warning: This replaces all local task data with the remote backup.
+// Requires credentials to be configured via "ticktask sync config".
 var downCmd = &cobra.Command{
 	Use:   "down",
 	Short: "pulls latest db backup to your local",

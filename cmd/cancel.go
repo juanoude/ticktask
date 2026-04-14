@@ -15,10 +15,13 @@ func init() {
 	rootCmd.AddCommand(cancelCmd)
 }
 
+// cancelCmd permanently removes a task from the workspace.
+// Unlike "done", cancelled tasks are not preserved in the done bucket.
+// Shows an interactive selector to choose which task to cancel.
 var cancelCmd = &cobra.Command{
 	Use:   "cancel",
-	Short: "Cancel a task",
-	Long:  `All software has versions. This is ticktack's`,
+	Short: "Cancel and remove a task",
+	Long:  `Opens an interactive selector to choose a task to permanently delete.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		workspace := workspace.GetSelectedWorkspace()
 		tasks, err := persistence.GetDB().Get(true, workspace)

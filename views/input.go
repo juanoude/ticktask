@@ -9,18 +9,24 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+// errorMsg wraps errors for the Bubble Tea message system.
 type (
 	errorMsg error
 )
 
+// inputState holds the state for the text input component.
+// Implements the tea.Model interface for Bubble Tea.
 type inputState struct {
-	header       string
-	textInput    textinput.Model
-	wasCancelled bool
-	isSecret     bool
-	err          error
+	header       string          // Prompt displayed above the input field
+	textInput    textinput.Model // The Bubble Tea text input component
+	wasCancelled bool            // True if user pressed Esc or Ctrl+C
+	isSecret     bool            // If true, input should be masked (not currently implemented)
+	err          error           // Any error that occurred during input
 }
 
+// RunInput displays a text input prompt and returns the entered value.
+// Returns the input text and a boolean indicating if the user cancelled.
+// The isSecret parameter is intended for password masking but not currently implemented.
 func RunInput(header string, isSecret bool) (string, bool) {
 	p := tea.NewProgram(initInput(header, isSecret))
 	result, err := p.Run()
@@ -33,6 +39,8 @@ func RunInput(header string, isSecret bool) (string, bool) {
 	return finalResult.textInput.Value(), finalResult.wasCancelled
 }
 
+// initInput creates the initial state for a text input with the given header.
+// Sets up a text input with 156 character limit and 20 character display width.
 func initInput(header string, isSecret bool) inputState {
 	ti := textinput.New()
 	ti.Placeholder = "Pikachu"
@@ -49,10 +57,13 @@ func initInput(header string, isSecret bool) inputState {
 	}
 }
 
+// Init starts the cursor blinking animation.
 func (state inputState) Init() tea.Cmd {
 	return textinput.Blink
 }
 
+// Update handles keyboard input for the text field.
+// Enter confirms the input, Esc/Ctrl+C cancels.
 func (state inputState) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
@@ -66,7 +77,6 @@ func (state inputState) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return state, tea.Quit
 		}
 
-	// We handle errors just like any other message
 	case errorMsg:
 		state.err = msg
 		return state, nil
@@ -77,6 +87,7 @@ func (state inputState) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 }
 
+// View renders the input prompt with the header, text field, and instructions.
 func (state inputState) View() string {
 	return fmt.Sprintf(
 		state.header+"\n\n%s\n\n%s",

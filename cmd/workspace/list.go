@@ -11,10 +11,12 @@ func init() {
 	WorkspaceCmd.AddCommand(listCmd)
 }
 
+// listCmd displays all workspaces.
+// The currently selected workspace is marked with "->".
 var listCmd = &cobra.Command{
 	Use:   "list",
-	Short: "lists all your workspaces",
-	Long:  "Here you can see the entire list",
+	Short: "List all workspaces",
+	Long:  `Shows all available workspaces. The current workspace is marked with an arrow.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		list := persistence.GetDB().GetWorkspaces()
 		selected := GetSelectedWorkspace()
