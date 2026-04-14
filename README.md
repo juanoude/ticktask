@@ -55,6 +55,16 @@ Optional backup/sync of the local database to S3:
 - `ticktask sync up` — push local DB to the remote backup
 - `ticktask sync down` — pull remote backup and overwrite local
 
+### Music
+
+Configure the music backend for the focus timer:
+
+- `ticktask music config` — choose backend (local or Navidrome) and configure settings
+
+**Local backend** (default): Place MP3/FLAC files in `~/.ticktask/music/{focus,idle,generic}/`
+
+**Navidrome backend**: Stream from a Navidrome server. Configure URL, username, password (stored in system keyring), and playlist names.
+
 ## License
 
 This project is licensed under the BSD 3-Clause License; see [LICENSE](LICENSE).

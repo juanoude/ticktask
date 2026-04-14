@@ -14,6 +14,8 @@
 //	│   ├── select        - Switch workspace
 //	│   ├── move          - Move tasks between workspaces
 //	│   └── remove        - Delete workspace
+//	├── music             - Music configuration
+//	│   └── config        - Configure backend (local/Navidrome)
 //	└── sync              - S3 backup/restore
 //	    ├── config        - Configure AWS credentials
 //	    ├── up            - Push to S3
@@ -23,6 +25,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"ticktask/cmd/music"
 	"ticktask/cmd/sync"
 	"ticktask/cmd/workspace"
 
@@ -39,6 +42,7 @@ func init() {
 	// Register subcommand groups
 	rootCmd.AddCommand(workspace.WorkspaceCmd)
 	rootCmd.AddCommand(sync.SyncCmd)
+	rootCmd.AddCommand(music.MusicCmd)
 }
 
 // initConfig loads configuration from file (currently unused).

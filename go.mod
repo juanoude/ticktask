@@ -13,6 +13,7 @@ require (
 	github.com/ebitengine/oto/v3 v3.3.3
 	github.com/hajimehoshi/go-mp3 v0.3.4
 	github.com/joho/godotenv v1.5.1
+	github.com/mewkiz/flac v1.0.12
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
 	github.com/zalando/go-keyring v0.2.6

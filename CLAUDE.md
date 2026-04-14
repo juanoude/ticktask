@@ -23,6 +23,7 @@ ticktask/
 │   ├── focus.go            # ticktask focus [-o for open-ended]
 │   ├── version.go
 │   ├── workspace/          # ticktask workspaces <subcommand>
+│   ├── music/              # ticktask music config
 │   └── sync/               # ticktask sync <up|down|config>
 ├── models/
 │   └── task.go             # Task struct
@@ -36,9 +37,9 @@ ticktask/
 │   ├── input.go            # Text input
 │   └── countdown.go        # Focus timer (uses player)
 ├── player/
-│   └── player.go           # Audio playback (oto + go-mp3)
+│   └── player.go           # Audio playback (oto + go-mp3/flac)
 ├── config/
-│   └── music.go            # Music backend config (local/navidrome)
+│   └── music.go            # Music config loader (from DB/keyring)
 ├── navidrome/
 │   └── client.go           # Subsonic API client for Navidrome
 └── utils/
@@ -50,9 +51,10 @@ ticktask/
 ## Data Location
 
 All data lives in `~/.ticktask/`:
-- `tasks.db` - BoltDB database (tasks, workspaces, config)
-- `config.yaml` - Music backend configuration (optional)
+- `data/ticktask.db` - BoltDB database (tasks, workspaces, config)
 - `music/` - Local music files (focus/, idle/, generic/)
+
+Sensitive credentials (AWS keys, Navidrome password) are stored in the system keyring.
 
 ## Key Flows
 
@@ -64,30 +66,35 @@ All data lives in `~/.ticktask/`:
 
 ### Music Loading (player/player.go)
 `loadMusicForPlaylist()` checks `config.LoadMusic().Backend`:
-- "local" → reads from ~/.ticktask/music/{focus,idle,generic}/
-- "navidrome" → streams from Navidrome server via Subsonic API
+- "local" → reads MP3/FLAC files from ~/.ticktask/music/{focus,idle,generic}/
+- "navidrome" → streams FLAC from Navidrome server via Subsonic API (raw format)
 
-## Config File (~/.ticktask/config.yaml)
+Audio format is auto-detected from file headers (FLAC: "fLaC", MP3: ID3/sync).
 
-```yaml
-music:
-  backend: navidrome  # or "local" (default)
-  navidrome:
-    base_url: http://localhost:4533
-    username: user
-    password: pass  # or use TICKTASK_NAVIDROME_PASSWORD env
-    playlists:
-      focus: "Deep Focus"
-      rest: "Chill"
-      generic: "Background"
-```
+## Configuration
+
+Configuration is stored in BoltDB (non-sensitive) and the system keyring (secrets).
+
+### Music Configuration
+Run `ticktask music config` to configure:
+- Backend: "local" or "navidrome"
+- Navidrome settings: URL, username, password, playlist names
+
+Password can also be set via `TICKTASK_NAVIDROME_PASSWORD` environment variable.
+
+### Sync Configuration
+Run `ticktask sync config` to configure:
+- AWS region, bucket name (stored in DB)
+- AWS credentials (stored in system keyring)
 
 ## Dependencies
 
 - **cobra/viper** - CLI framework
 - **bubbletea** - TUI framework
 - **boltdb** - Embedded key-value store
-- **oto/go-mp3** - Audio playback
+- **oto** - Cross-platform audio output
+- **go-mp3** - MP3 decoding (local files)
+- **mewkiz/flac** - FLAC decoding (Navidrome streaming)
 - **go-keyring** - System keyring access
 - **aws-sdk-go-v2** - S3 sync
 

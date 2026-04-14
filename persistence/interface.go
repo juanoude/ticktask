@@ -25,6 +25,19 @@ const (
 	AWSBucketNameConfig string = "aws_bucket_name"
 )
 
+// Configuration keys for music/Navidrome settings stored in the local database.
+const (
+	MusicBackendConfig          string = "music_backend"           // "local" or "navidrome"
+	NavidromeBaseURLConfig      string = "navidrome_base_url"      // Server URL
+	NavidromeUsernameConfig     string = "navidrome_username"      // Subsonic username
+	NavidromePlaylistFocusConfig   string = "navidrome_playlist_focus"   // Focus playlist name
+	NavidromePlaylistRestConfig    string = "navidrome_playlist_rest"    // Rest playlist name
+	NavidromePlaylistGenericConfig string = "navidrome_playlist_generic" // Generic playlist name
+)
+
+// Wallet key for Navidrome password (stored in system keyring).
+const NavidromePasswordKey string = "navidrome_password"
+
 // PersistenceLayer defines the interface for local data storage operations.
 // Implementations handle tasks, workspaces, and application configuration.
 // The current implementation uses BoltDB as the underlying storage engine.
